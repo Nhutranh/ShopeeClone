@@ -1,4 +1,5 @@
 import { RegisterOptions } from 'react-hook-form'
+import * as yup from 'yup'
 
 type Rules = {
   [key in 'email' | 'password' | 'confirm_pasword']?: RegisterOptions
@@ -54,3 +55,27 @@ export const rules: Rules = {
     }
   }
 }
+
+export const schema = yup.object({
+  email: yup
+    .string()
+    .required('Email là bắt buộc')
+    .email('email không đúng định dạng')
+    .min(5, 'Độ dài từ 5 - 160 ký tự')
+    .max(160, 'Độ dài từ 5 - 160 ký tự'),
+  password: yup
+    .string()
+    .required('password là bắt buộc')
+    .min(6, 'Độ dài từ 6 - 160 ký tự')
+    .max(160, 'Độ dài từ 6 - 160 ký tự'),
+  confirm_pasword: yup
+    .string()
+    .required('nhập lại password là bắt buộc')
+    .min(6, 'Độ dài từ 6 - 160 ký tự')
+    .max(160, 'Độ dài từ 6 - 160 ký tự')
+    .oneOf([yup.ref('password')], 'Nhập lại password không khớp')
+})
+
+//const loginSchema = schema.omit(['confirm_pasword'])
+
+export type Schema = yup.InferType<typeof schema>

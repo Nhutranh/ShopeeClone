@@ -1,13 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import Input from 'src/component/Input'
-import { rules } from 'src/untils/rules'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { schema, Schema } from 'src/untils/rules'
 
-interface FormData {
-  email: string
-  password: string
-  confirm_pasword: string
-}
+type FormData = Schema
 
 export default function Register() {
   const {
@@ -15,7 +12,9 @@ export default function Register() {
     handleSubmit,
     watch,
     formState: { errors }
-  } = useForm<FormData>()
+  } = useForm<FormData>({
+    resolver: yupResolver(schema)
+  })
 
   const formValues = watch('password')
   console.log(formValues)
@@ -38,7 +37,6 @@ export default function Register() {
                 placehoder='email'
                 errorMessage={errors.email?.message}
                 className='mt-8'
-                rules={rules.email}
               />
 
               <Input
@@ -48,7 +46,6 @@ export default function Register() {
                 placehoder='password'
                 errorMessage={errors.password?.message}
                 className='mt-8'
-                rules={rules.password}
               />
               <Input
                 name='confirm_pasword'
@@ -57,7 +54,6 @@ export default function Register() {
                 placehoder='confirm_pasword'
                 errorMessage={errors.confirm_pasword?.message}
                 className='mt-8'
-                rules={rules.confirm_pasword}
                 autoComplete='on'
               />
               <div className='mt-3'>
