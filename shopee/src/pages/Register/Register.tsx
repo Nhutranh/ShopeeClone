@@ -26,9 +26,6 @@ export default function Register() {
     mutationFn: (body: Omit<FormData, 'confirm_pasword'>) => registerAccount(body)
   })
 
-  const formValues = watch()
-  console.log(formValues)
-
   const onSubmit = handleSubmit((data) => {
     const body = omit(data, ['confirm_pasword'])
     registerAccountMutation.mutate(body, {
@@ -55,12 +52,15 @@ export default function Register() {
     })
   })
 
+  const formValues = watch()
+  console.log(formValues)
+
   return (
     <div className='bg-orange-400'>
       <div className='container'>
         <div className='grid grid-cols-1 lg:grid-cols-5 py-10 lg:py-32 lg:px-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form onSubmit={onSubmit} className='p-10 rounded bg-white shadow-sm'>
+            <form onSubmit={onSubmit} noValidate className='p-10 rounded bg-white shadow-sm'>
               <div className='text-2xl'>Đăng ký</div>
               <Input
                 name='email'
