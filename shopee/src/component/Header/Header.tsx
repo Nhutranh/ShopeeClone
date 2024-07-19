@@ -1,8 +1,23 @@
 import { Link } from 'react-router-dom'
 import images from 'src/assets/images'
 import Popover from '../Popover'
+import { useMutation } from '@tanstack/react-query'
+import { logout } from 'src/api/Auth.api'
+import { useContext } from 'react'
+import { AppContext } from 'src/contenxts/app.context'
 
 export default function Header() {
+  const { isAuthenticated, setIsAuthenticated } = useContext(AppContext)
+  const logoutMatation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      setIsAuthenticated(false)
+    }
+  })
+
+  const handleLogout = () => {
+    logoutMatation.mutate()
+  }
   return (
     <div className='pb-5 pt-2 bg-orange-500 text-sm text-white'>
       <div className='container'>
@@ -44,29 +59,48 @@ export default function Header() {
               <path strokeLinecap='round' strokeLinejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' />
             </svg>
           </Popover>
-          <Popover
-            className='flex items-center py-1 hover:text-gray-300 cursor-pointer'
-            renderPopover={
-              <div className='shadow-md'>
-                <Link to='/' className='text-left block py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'>
-                  Tài khoản của tôi
-                </Link>
-                <Link to='/' className='text-left block py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'>
-                  Đơn mua
-                </Link>
-                <button className='text-left block w-full py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'>
-                  Đăng xuất
-                </button>
+          {isAuthenticated && (
+            <Popover
+              className='flex items-center py-1 hover:text-gray-300 cursor-pointer'
+              renderPopover={
+                <div className='shadow-md'>
+                  <Link
+                    to='/profile'
+                    className='text-left block py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'
+                  >
+                    Tài khoản của tôi
+                  </Link>
+                  <Link to='/' className='text-left block py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'>
+                    Đơn mua
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className='text-left block w-full py-2 px-3 hover:bg-slate-100 bg-white hover:text-cyan-500'
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              }
+            >
+              <div className='w-6 h-6 mr-2 flex-shrink-0'>
+                <img src={images.logo} alt='avt' className='w-full h-full object-cover rounded-full' />
               </div>
-            }
-          >
-            <div className='w-6 h-6 mr-2 flex-shrink-0'>
-              <img src={images.logo} alt='avt' className='w-full h-full object-cover rounded-full' />
-            </div>
-            <div>Phan Ngọc Như Tranh</div>
-          </Popover>
+              <div>Phan Ngọc Như Tranh</div>
+            </Popover>
+          )}
 
-          <div className='flex items-center py-1 hover:text-gray-300 cursor-pointer'></div>
+          {!isAuthenticated && (
+            <div className='flex items-center'>
+              <Link to='/register' className='mx-3 capitalize hover:text-white/70'>
+                Đăng ký
+              </Link>
+              <div className='border-r-[1px] border-r-white/40 h-4'>
+                <Link to='/login' className='mx-3 capitalize hover:text-white/70'>
+                  Đăng nhập
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
         <div className='grid grid-cols-12 gap-4 mt-4 items-end'>
           <Link to={'/'} className='flex col-span-2'>
@@ -99,23 +133,92 @@ export default function Header() {
               </button>
             </div>
           </form>
-          <div className='cols-sapn-1'>
-            <Link to='/'>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth={1.5}
-                stroke='currentColor'
-                className='w-8 h-8'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
-                />
-              </svg>
-            </Link>
+          <div className='cols-span-1 justify-self-start'>
+            <Popover
+              renderPopover={
+                <div className='bg-white max-w-[400px] text-sm shadow-md rounded-sm relative border-gray-200'>
+                  <div className='p-2'>
+                    <div className='text-gray-400 capitalize'>Sản phẩm mới thêm</div>
+                    <div className='mt-5'>
+                      <div className='mt-4 flex'>
+                        <div className='flex-shrink-0'>
+                          <img
+                            src='https://down-vn.img.susercontent.com/file/80bfe05564765df12e5cf00559d6ef7a'
+                            alt='avt'
+                            className='h-11 w-11 object-cover'
+                          />
+                        </div>
+                        <div className='flex-grow ml-2 overflow-hidden'>
+                          <div className='truncate'>
+                            Mút tán kem nền FOCALLURE dạng giọt nước mềm mại tiện dụng 20g/mút
+                          </div>
+                        </div>
+                        <div className='ml-2 flex-shrink-0'>
+                          <span className='text-orange-500'>₫12.000</span>
+                        </div>
+                      </div>
+                      <div className='mt-4 flex'>
+                        <div className='flex-shrink-0'>
+                          <img
+                            src='https://down-vn.img.susercontent.com/file/80bfe05564765df12e5cf00559d6ef7a'
+                            alt='avt'
+                            className='h-11 w-11 object-cover'
+                          />
+                        </div>
+                        <div className='flex-grow ml-2 overflow-hidden'>
+                          <div className='truncate'>
+                            Mút tán kem nền FOCALLURE dạng giọt nước mềm mại tiện dụng 20g/mút
+                          </div>
+                        </div>
+                        <div className='ml-2 flex-shrink-0'>
+                          <span className='text-orange-500'>₫12.000</span>
+                        </div>
+                      </div>
+                      <div className='mt-4 flex'>
+                        <div className='flex-shrink-0'>
+                          <img
+                            src='https://down-vn.img.susercontent.com/file/80bfe05564765df12e5cf00559d6ef7a'
+                            alt='avt'
+                            className='h-11 w-11 object-cover'
+                          />
+                        </div>
+                        <div className='flex-grow ml-2 overflow-hidden'>
+                          <div className='truncate'>
+                            Mút tán kem nền FOCALLURE dạng giọt nước mềm mại tiện dụng 20g/mút
+                          </div>
+                        </div>
+                        <div className='ml-2 flex-shrink-0'>
+                          <span className='text-orange-500'>₫12.000</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-5 flex items-center justify-center'>
+                      <div className='capitalize text-xs'>Thêm hàng vào giỏ</div>
+                      <button className='ml-10 capitalize bg-orange-500 hover:bg-opacity-80 px-4 py-2 rounded-sm text-white'>
+                        Xem giỏ hàng
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            >
+              <Link to='/'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
+                  className='w-8 h-8'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
+                  />
+                </svg>
+              </Link>
+            </Popover>
           </div>
         </div>
       </div>
