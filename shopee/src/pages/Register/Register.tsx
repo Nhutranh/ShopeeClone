@@ -10,11 +10,12 @@ import { isAxiosUnprocessableEntityError } from 'src/untils/untils'
 import { ErrorRespone } from 'src/types/until.type'
 import { useContext } from 'react'
 import { AppContext } from 'src/contenxts/app.context'
+import Button from 'src/component/Button'
 
 type FormData = Schema
 
 export default function Register() {
-  const { setIsAuthenticated } = useContext(AppContext)
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
   const {
     register,
@@ -32,7 +33,8 @@ export default function Register() {
   const onSubmit = handleSubmit((data) => {
     const body = omit(data, ['confirm_pasword'])
     registerAccountMutation.mutate(body, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setProfile(data.data.data.user)
         setIsAuthenticated(true)
         navigate('/')
       },
@@ -90,9 +92,13 @@ export default function Register() {
                 autoComplete='on'
               />
               <div className='mt-3'>
-                <button className='w-full text-center py-3 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>
+                <Button
+                  className='w-full text-center py-3 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'
+                  isLoading={registerAccountMutation.isLoading}
+                  disabled={registerAccountMutation.isLoading}
+                >
                   Đăng ký
-                </button>
+                </Button>
               </div>
               <div className='mt-8 text-center'>
                 <div className='flex items-center'>

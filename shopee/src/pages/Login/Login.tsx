@@ -4,6 +4,7 @@ import { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from 'src/api/Auth.api'
+import Button from 'src/component/Button'
 import Input from 'src/component/Input'
 import { AppContext } from 'src/contenxts/app.context'
 import { ErrorRespone } from 'src/types/until.type'
@@ -15,7 +16,7 @@ type FormData = Omit<Schema, 'confirm_pasword'>
 const loginSchema = schema.omit(['confirm_pasword'])
 
 export default function Login() {
-  const { setIsAuthenticated } = useContext(AppContext)
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
   const {
     setError,
@@ -32,7 +33,8 @@ export default function Login() {
 
   const onSubmit = handleSubmit((data) => {
     loginMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setProfile(data.data.data.user)
         setIsAuthenticated(true)
         navigate('/')
       },
@@ -80,12 +82,14 @@ export default function Login() {
                 />
               </div>
               <div className='mt-3'>
-                <button
+                <Button
                   type='submit'
-                  className='w-full text-center py-3 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'
+                  className='w-full flex justify-center items-center py-3 px-2 uppercase bg-red-500 text-white text-sm hover:bg-red-600'
+                  isLoading={loginMutation.isLoading}
+                  disabled={loginMutation.isLoading}
                 >
                   Đăng nhập
-                </button>
+                </Button>
               </div>
               <div className='mt-8 text-center'>
                 <div className='flex items-center'>
