@@ -22,6 +22,8 @@ export default {
           paddingRight: '1rem'
         }
       })
-    })
+    }),
+    // eslint-disable-next-line no-undef
+    require('@tailwindcss/line-clamp')
   ]
 }
