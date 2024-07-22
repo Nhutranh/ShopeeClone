@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from 'src/api/Auth.api'
+import authApi from 'src/api/Auth.api'
 import Button from 'src/component/Button'
 import Input from 'src/component/Input'
 import { AppContext } from 'src/contenxts/app.context'
@@ -28,7 +28,7 @@ export default function Login() {
   })
 
   const loginMutation = useMutation({
-    mutationFn: (body: Omit<FormData, 'confirm_pasword'>) => login(body)
+    mutationFn: (body: Omit<FormData, 'confirm_pasword'>) => authApi.login(body)
   })
 
   const onSubmit = handleSubmit((data) => {
