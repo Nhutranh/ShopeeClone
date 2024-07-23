@@ -1,25 +1,27 @@
 import classNames from 'classnames'
+import { Link, createSearchParams } from 'react-router-dom'
+import path from 'src/constants/path'
+import { QueryConfig } from 'src/pages/ProductList/ProductList'
 
 interface Props {
-  page: number
-  setPage: React.Dispatch<React.SetStateAction<number>>
+  queryConfig: QueryConfig
   pageSize: number
 }
 const range = 2
-export default function Paginate({ page, setPage, pageSize }: Props) {
+export default function Paginate({ queryConfig, pageSize }: Props) {
+  const page = Number(queryConfig.page)
   const renderPagination = () => {
-    let dotAfter = false
     let dotBefore = false
     const renderDotBefore = (index: number) => {
       if (!dotBefore) {
         dotBefore = true
         return (
-          <button
+          <span
             key={index}
             className='bg-white border rounded-md hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'
           >
             ...
-          </button>
+          </span>
         )
       }
     }
@@ -27,12 +29,12 @@ export default function Paginate({ page, setPage, pageSize }: Props) {
       if (!dotBefore) {
         dotBefore = true
         return (
-          <button
+          <span
             key={index}
             className='bg-white border rounded-md hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'
           >
             ...
-          </button>
+          </span>
         )
       }
     }
@@ -52,7 +54,14 @@ export default function Paginate({ page, setPage, pageSize }: Props) {
           return renderDotBefore(index)
         }
         return (
-          <button
+          <Link
+            to={{
+              pathname: path.home,
+              search: createSearchParams({
+                ...queryConfig,
+                page: pageNUmb.toString()
+              }).toString()
+            }}
             key={index}
             className={classNames(
               'bg-white rounded-md hover:bg-slate-100 border px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer',
@@ -61,22 +70,51 @@ export default function Paginate({ page, setPage, pageSize }: Props) {
                 'border-transparent': pageNUmb !== page
               }
             )}
-            onClick={() => setPage(pageNUmb)}
           >
             {pageNUmb}
-          </button>
+          </Link>
         )
       })
   }
   return (
     <div className='flex flex-wrap mt-6 justify-center'>
-      <button className='bg-white rounded-md border hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'>
-        Prev
-      </button>
+      {page === 1 ? (
+        <span className='bg-white rounded-md border hover:bg-slate-300 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-not-allowed'>
+          Prev
+        </span>
+      ) : (
+        <Link
+          to={{
+            pathname: path.home,
+            search: createSearchParams({
+              ...queryConfig,
+              page: (page - 1).toString()
+            }).toString()
+          }}
+          className='bg-white rounded-md border hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'
+        >
+          Prev
+        </Link>
+      )}
       {renderPagination()}
-      <button className='bg-white rounded-md border hover:bg-slate-100  px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'>
-        Next
-      </button>
+      {page === pageSize ? (
+        <span className='bg-white rounded-md border hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 '>
+          Next
+        </span>
+      ) : (
+        <Link
+          to={{
+            pathname: path.home,
+            search: createSearchParams({
+              ...queryConfig,
+              page: (page + 1).toString()
+            }).toString()
+          }}
+          className='bg-white rounded-md border hover:bg-slate-100 px-3 py-2 shadow-sm flex items-center justify-center mx-2 cursor-pointer'
+        >
+          Next
+        </Link>
+      )}
     </div>
   )
 }
