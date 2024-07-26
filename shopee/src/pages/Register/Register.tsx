@@ -12,7 +12,8 @@ import { useContext } from 'react'
 import { AppContext } from 'src/contenxts/app.context'
 import Button from 'src/component/Button'
 
-type FormData = Schema
+type FormData = Pick<Schema, 'email' | 'password' | 'confirm_pasword'>
+const registerSchema = schema.pick(['email', 'password', 'confirm_pasword'])
 
 export default function Register() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
@@ -23,7 +24,7 @@ export default function Register() {
     setError,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: yupResolver(schema)
+    resolver: yupResolver(registerSchema)
   })
 
   const registerAccountMutation = useMutation({

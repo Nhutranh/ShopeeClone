@@ -7,6 +7,7 @@ import ProductApi from 'src/api/Product.api'
 import Paginate from 'src/component/Paginate'
 import { ProductListConfig } from 'src/types/product.type'
 import { omitBy, isUndefined } from 'lodash'
+import categoryApi from 'src/api/Category.api'
 
 export type QueryConfig = {
   [key in keyof ProductListConfig]: string
@@ -24,36 +25,43 @@ export default function ProductList() {
       order: queryParams.order,
       price_max: queryParams.price_max,
       price_min: queryParams.price_min,
-      rating_filter: queryParams.rating_filter
+      rating_filter: queryParams.rating_filter,
+      category: queryParams.category
     },
     isUndefined
   )
 
-  const { data } = useQuery({
+  const { data: productsData } = useQuery({
     queryKey: ['products', queryConfig],
     queryFn: () => {
       return ProductApi.getProduct(queryConfig as ProductListConfig)
     }
   })
-  console.log(data)
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => {
+      return categoryApi.getCategory()
+    }
+  })
   return (
     <div className='bg-gray-200 py-6'>
       <div className='container'>
-        {data && (
+        {productsData && (
           <div className='grid grid-cols-12 gap-6'>
             <div className='col-span-3'>
-              <AsideFilter />
+              <AsideFilter queryConfig={queryConfig} categories={categoriesData?.data.data || []} />
             </div>
             <div className='col-span-9'>
-              <SortProductList queryConfig={queryConfig} pageSize={data?.data.data.pagination.page_size} />
+              <SortProductList queryConfig={queryConfig} pageSize={productsData?.data.data.pagination.page_size} />
               <div className='mt-6 grid gris-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3'>
-                {data?.data?.data?.products?.map((product) => (
+                {productsData?.data?.data?.products?.map((product) => (
                   <div key={product._id} className='col-span-1'>
                     <Product product={product} />
                   </div>
                 ))}
               </div>
-              <Paginate queryConfig={queryConfig} pageSize={data?.data.data.pagination.page_size} />
+              <Paginate queryConfig={queryConfig} pageSize={productsData?.data.data.pagination.page_size} />
             </div>
           </div>
         )}

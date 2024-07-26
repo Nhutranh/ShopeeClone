@@ -56,6 +56,14 @@ export const rules: Rules = {
   }
 }
 
+function testPriceMinMax(this: yup.TestContext<yup.AnyObject>) {
+  const { priceMin, priceMax } = this.parent as { priceMin: string; priceMax: string }
+  if (priceMin !== '' && priceMax !== '') {
+    return Number(priceMax) >= Number(priceMin)
+  }
+  return priceMin !== '' || priceMax !== ''
+}
+
 export const schema = yup.object({
   email: yup
     .string()
@@ -73,7 +81,17 @@ export const schema = yup.object({
     .required('nhập lại password là bắt buộc')
     .min(6, 'Độ dài từ 6 - 160 ký tự')
     .max(160, 'Độ dài từ 6 - 160 ký tự')
-    .oneOf([yup.ref('password')], 'Nhập lại password không khớp')
+    .oneOf([yup.ref('password')], 'Nhập lại password không khớp'),
+  priceMin: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'giá không phù hợp',
+    test: testPriceMinMax
+  }),
+  priceMax: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'giá không phù hợp',
+    test: testPriceMinMax
+  })
 })
 
 //const loginSchema = schema.omit(['confirm_pasword'])

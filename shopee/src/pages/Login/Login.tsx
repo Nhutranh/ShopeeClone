@@ -12,8 +12,8 @@ import { ErrorRespone } from 'src/types/until.type'
 import { schema, Schema } from 'src/untils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/untils/untils'
 
-type FormData = Omit<Schema, 'confirm_pasword'>
-const loginSchema = schema.omit(['confirm_pasword'])
+type FormData = Pick<Schema, 'email' | 'password'>
+const loginSchema = schema.pick(['email', 'password'])
 
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
