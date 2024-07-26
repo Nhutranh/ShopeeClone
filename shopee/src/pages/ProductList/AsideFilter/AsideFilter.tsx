@@ -9,6 +9,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { Schema, schema } from 'src/untils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NoUndefindField } from 'src/types/until.type'
+import RatingStart from 'src/component/RatingStart'
+import { omit } from 'lodash'
 
 interface Props {
   queryConfig: QueryConfig
@@ -46,6 +48,13 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       }).toString()
     })
   })
+
+  const handleRemoveAll = () => {
+    navigate({
+      pathname: path.home,
+      search: createSearchParams(omit(queryConfig, ['price_min', 'price_max', 'rating_filter', 'category'])).toString()
+    })
+  }
 
   console.log(errors)
   return (
@@ -169,54 +178,12 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       </div>
       <div className='bg-gray-300 h-[1px] my-4' />
       <div className='text-sm'>Đánh giá</div>
-      <ul className='my-3'>
-        <li className='py-1 pl-2'>
-          <Link to='/' className='flex items-center text-sm '>
-            {Array(5)
-              .fill(0)
-              .map((_, index) => (
-                <svg key={index} viewBox='0 0 30 30' className='h-4 w-4 mr-1'>
-                  <defs>
-                    <linearGradient id='star__hollow' x1='50%' x2='50%' y1='0%' y2='99.0177926%'>
-                      <stop offset='0%' stopColor='#FFD211'></stop>
-                      <stop offset='100%' stopColor='#FFAD27'></stop>
-                    </linearGradient>
-                  </defs>
-                  <path
-                    fill='none'
-                    stroke='url(#star__hollow)'
-                    d='M23.226809 28.390899l-1.543364-9.5505903 6.600997-6.8291523-9.116272-1.4059447-4.01304-8.63019038-4.013041 8.63019038-9.116271 1.4059447 6.600997 6.8291523-1.543364 9.5505903 8.071679-4.5038874 8.071679 4.5038874z'
-                  ></path>
-                </svg>
-              ))}
-            Trở lên
-          </Link>
-        </li>
-        <li className='py-1 pl-2'>
-          <Link to='/' className='flex items-center text-sm '>
-            {Array(5)
-              .fill(0)
-              .map((_, index) => (
-                <svg key={index} viewBox='0 0 30 30' className='h-4 w-4 mr-1'>
-                  <defs>
-                    <linearGradient id='star__hollow' x1='50%' x2='50%' y1='0%' y2='99.0177926%'>
-                      <stop offset='0%' stopColor='#FFD211'></stop>
-                      <stop offset='100%' stopColor='#FFAD27'></stop>
-                    </linearGradient>
-                  </defs>
-                  <path
-                    fill='none'
-                    stroke='url(#star__hollow)'
-                    d='M23.226809 28.390899l-1.543364-9.5505903 6.600997-6.8291523-9.116272-1.4059447-4.01304-8.63019038-4.013041 8.63019038-9.116271 1.4059447 6.600997 6.8291523-1.543364 9.5505903 8.071679-4.5038874 8.071679 4.5038874z'
-                  ></path>
-                </svg>
-              ))}
-            Trở lên
-          </Link>
-        </li>
-      </ul>
+      <RatingStart queryConfig={queryConfig} />
       <div className='bg-gray-300 h-[1px] my-4' />
-      <Button className='w-full py-2 px-2 uppercase bg-orange-500 text-white text-sm hover:bg-orange-300 flex justify-center items-center'>
+      <Button
+        onClick={handleRemoveAll}
+        className='w-full py-2 px-2 uppercase bg-orange-500 text-white text-sm hover:bg-orange-300 flex justify-center items-center'
+      >
         Xóa tất cả
       </Button>
     </div>
