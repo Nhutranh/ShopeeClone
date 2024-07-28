@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import DOMPurify from 'dompurify'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import ProductApi from 'src/api/Product.api'
 import InputNumber from 'src/component/InputNumber'
 import ProductRating from 'src/component/ProductRating'
+import { Product } from 'src/types/product.type'
 import { fomatCurrency, fomatNumberToSocialStyle, rateSale } from 'src/untils/untils'
 
 export default function ProductDetail() {
@@ -12,24 +14,88 @@ export default function ProductDetail() {
     queryKey: ['product', id],
     queryFn: () => ProductApi.getProductDetail(id as string)
   })
+
   const product = productDetailData?.data.data
+  const [curentIndexImages, setCurentIndexImages] = useState([0, 5])
+  const [curentActiveImage, setCurentActiveImage] = useState('')
+  const imagesRef = useRef<HTMLImageElement>(null)
+  const curentImages = useMemo(
+    () => (product ? product?.images.slice(...curentIndexImages) : []),
+    [product, curentIndexImages]
+  )
+
+  useEffect(() => {
+    if (product && product.images.length > 0) {
+      setCurentActiveImage(product.images[0])
+    }
+  }, [product])
+
+  const next = () => {
+    if (curentIndexImages[1] < (product as Product)?.images.length) {
+      setCurentIndexImages((prev) => [prev[0] + 1, prev[1] + 1])
+    }
+  }
+
+  const prev = () => {
+    if (curentIndexImages[0] > 0) {
+      setCurentIndexImages((prev) => [prev[0] - 1, prev[1] - 1])
+    }
+  }
+
+  const chosseActive = (img: string) => {
+    setCurentActiveImage(img)
+  }
+
+  const handleZoom = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+
+    const images = imagesRef.current as HTMLImageElement
+    const { naturalHeight, naturalWidth } = images
+    //CÁCH 1:  Lấy offsetX và offsetY để tính được tọa độ khi chúng ta đã xử lý được bubble event
+    // (bubble event là khi hover chuột và thẻ cha có thẻ con chồng nhau và sự kiện của mỗi thẻ chồng chéo lên nhau)
+    //const { offsetX, offsetY } = event.nativeEvent
+
+    //CÁCH 2: Lấy offsetX và offsetY để tính được tọa độ khi chúng ta  chưa xử lý được bubble event
+    const offsetX = event.pageX - (rect.x + window.scrollX)
+    const offsetY = event.pageY - (rect.y + window.scrollY)
+
+    const top = offsetY * (1 - naturalHeight / rect.height)
+    const left = offsetX * (1 - naturalWidth / rect.width)
+    images.style.width = naturalWidth + 'px'
+    images.style.height = naturalHeight + 'px'
+    images.style.maxWidth = 'unset'
+    images.style.top = top + 'px'
+    images.style.left = left + 'px'
+  }
+
+  const hanldeRemoveZoom = () => {
+    imagesRef.current?.removeAttribute('style')
+  }
   if (!product) return null
-  console.log(product)
+
   return (
     <div className='bg-gray-200 py-6'>
-      <div className='bg-white p-4 shadow-sm'>
-        <div className='container'>
+      <div className='container'>
+        <div className='bg-white p-4 shadow-sm'>
           <div className='grid grid-cols-12 gap-9'>
             <div className='col-span-5'>
-              <div className='relative w-full pt-[100%] shadow-md'>
+              <div
+                className='relative w-full pt-[100%] shadow-md overflow-hidden cursor-zoom-in'
+                onMouseMove={handleZoom}
+                onMouseLeave={hanldeRemoveZoom}
+              >
                 <img
                   alt={product.name}
-                  className='absolute top-0 left-0  w-full h-full object-cover'
-                  src={product.image}
+                  className='absolute pointer-events-none top-0 left-0  w-full h-full object-cover'
+                  src={curentActiveImage}
+                  ref={imagesRef}
                 ></img>
               </div>
               <div className='relative mt-4 grid grid-cols-5 gap-1'>
-                <button className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  onClick={prev}
+                  className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
@@ -41,20 +107,23 @@ export default function ProductDetail() {
                     <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
                   </svg>
                 </button>
-                {product.images.slice(0, 5).map((img, index) => {
-                  const isActive = index === 0
+                {curentImages.map((img) => {
+                  const isActive = img === curentActiveImage
                   return (
-                    <div className='relative w-full pt-[100%]' key={img}>
+                    <div className='relative w-full pt-[100%]' key={img} onMouseEnter={() => chosseActive(img)}>
                       <img
                         alt={product.name}
                         className='absolute top-0 cursor-pointer left-0  w-full h-full object-cover'
-                        src={product.image}
+                        src={img}
                       ></img>
                       {isActive && <div className='absolute inset-0 border-2 border-orange-500'></div>}
                     </div>
                   )
                 })}
-                <button className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  onClick={next}
+                  className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
@@ -95,7 +164,10 @@ export default function ProductDetail() {
               <div className='mt-8 flex items-center'>
                 <div className='capitalize text-gray-500'> Số lượng</div>
                 <div className='ml-10 flex items-center'>
-                  <button className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'>
+                  <button
+                    onClick={prev}
+                    className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'
+                  >
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
@@ -113,7 +185,10 @@ export default function ProductDetail() {
                     classNameError='hidden'
                     classNameInput='h-8 w-14 border-t border-b border-gray-300 text-center outline-none'
                   />
-                  <button className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'>
+                  <button
+                    onClick={next}
+                    className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'
+                  >
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'
@@ -154,8 +229,9 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-      <div className='mt-8 bg-white shadow-sm p-4'>
-        <div className='container'>
+
+      <div className='container'>
+        <div className='mt-8 bg-white shadow-sm p-4'>
           <div className=' rounded bg-gray-50 text-lg capitalize text-gray-400'>Mô tả sản phẩm</div>
           <div className='mx-4 mt-12 mb-4 text-sm leading-loose'>
             <div
