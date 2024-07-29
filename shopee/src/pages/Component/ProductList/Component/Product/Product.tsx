@@ -10,8 +10,8 @@ interface Props {
 
 export default function Product({ product }: Props) {
   return (
-    <Link to={`${path.home}${generateNameID({ name: product.name, id: product._id })}`} className=''>
-      <div className='bg-white shadow-sm rounded-sm hover:translate-y-[-0.0625rem] hover:shadow-md duration-100 transition-transform'>
+    <Link to={`${path.home}${generateNameID({ name: product.name, id: product._id })}`}>
+      <div className='bg-white shadow-sm roundited-sm hover:translate-y-[-0.0625rem] hover:shadow-md duration-100 transition-transform'>
         <div className='w-full pt-[100%] relative'>
           <img
             alt={product.name}
