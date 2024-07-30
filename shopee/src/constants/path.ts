@@ -4,7 +4,7 @@ const path = {
   register: '/register',
   logout: '/logout',
   profile: '/profile',
-  productDetail: ':nameID'
+  productDetail: ':nameId'
 } as const
 
 export default path

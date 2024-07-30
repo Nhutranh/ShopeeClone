@@ -9,8 +9,8 @@ import { Product } from 'src/types/product.type'
 import { fomatCurrency, fomatNumberToSocialStyle, getIDFromNameID, rateSale } from 'src/untils/untils'
 
 export default function ProductDetail() {
-  const { nameID } = useParams()
-  const id = getIDFromNameID(nameID as string)
+  const { nameId } = useParams()
+  const id = getIDFromNameID(nameId as string)
   const { data: productDetailData } = useQuery({
     queryKey: ['product', id],
     queryFn: () => ProductApi.getProductDetail(id as string)
