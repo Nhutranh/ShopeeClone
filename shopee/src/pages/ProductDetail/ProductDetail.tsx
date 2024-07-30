@@ -3,12 +3,14 @@ import DOMPurify from 'dompurify'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import ProductApi from 'src/api/Product.api'
-import InputNumber from 'src/component/InputNumber'
 import ProductRating from 'src/component/ProductRating'
-import { Product } from 'src/types/product.type'
+import { Product as ProductType, ProductListConfig } from 'src/types/product.type'
 import { fomatCurrency, fomatNumberToSocialStyle, getIDFromNameID, rateSale } from 'src/untils/untils'
+import Product from '../Component/ProductList/Component/Product'
+import Quanlity from 'src/component/Quanlity'
 
 export default function ProductDetail() {
+  const [buyCount, setBuyCount] = useState(1)
   const { nameId } = useParams()
   const id = getIDFromNameID(nameId as string)
   const { data: productDetailData } = useQuery({
@@ -25,6 +27,17 @@ export default function ProductDetail() {
     [product, curentIndexImages]
   )
 
+  const queryConfig = { limit: '20', page: '1', category: product?.category._id }
+  const { data: productsData } = useQuery({
+    queryKey: ['products', queryConfig],
+    queryFn: () => {
+      return ProductApi.getProduct(queryConfig as unknown as ProductListConfig)
+    },
+    enabled: Boolean(product),
+    staleTime: 3 * 60 * 1000
+  })
+  console.log(productsData)
+
   useEffect(() => {
     if (product && product.images.length > 0) {
       setCurentActiveImage(product.images[0])
@@ -32,7 +45,7 @@ export default function ProductDetail() {
   }, [product])
 
   const next = () => {
-    if (curentIndexImages[1] < (product as Product)?.images.length) {
+    if (curentIndexImages[1] < (product as ProductType)?.images.length) {
       setCurentIndexImages((prev) => [prev[0] + 1, prev[1] + 1])
     }
   }
@@ -72,6 +85,11 @@ export default function ProductDetail() {
   const hanldeRemoveZoom = () => {
     imagesRef.current?.removeAttribute('style')
   }
+
+  const handleBuyCount = (value: number) => {
+    setBuyCount(value)
+  }
+
   if (!product) return null
 
   return (
@@ -164,44 +182,13 @@ export default function ProductDetail() {
               </div>
               <div className='mt-8 flex items-center'>
                 <div className='capitalize text-gray-500'> Số lượng</div>
-                <div className='ml-10 flex items-center'>
-                  <button
-                    onClick={prev}
-                    className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      strokeWidth={1.5}
-                      stroke='currentColor'
-                      className='w-4 h-4'
-                    >
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M19.5 12h-15' />
-                    </svg>
-                  </button>
-                  <InputNumber
-                    value={1}
-                    className=''
-                    classNameError='hidden'
-                    classNameInput='h-8 w-14 border-t border-b border-gray-300 text-center outline-none'
-                  />
-                  <button
-                    onClick={next}
-                    className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-400 text-gray-600'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                      strokeWidth={1.5}
-                      stroke='currentColor'
-                      className='w-4 h-4'
-                    >
-                      <path strokeLinecap='round' strokeLinejoin='round' d='M12 4.5v15m7.5-7.5h-15' />
-                    </svg>
-                  </button>
-                </div>
+                <Quanlity
+                  onDecrease={handleBuyCount}
+                  onIncrease={handleBuyCount}
+                  onType={handleBuyCount}
+                  value={buyCount}
+                  max={product.quantity}
+                />
                 <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sẵn </div>
               </div>
               <div className='mt-8 flex items-center'>
@@ -241,6 +228,18 @@ export default function ProductDetail() {
               }}
             />
             /
+          </div>
+        </div>
+      </div>
+      <div className='mt-8 '>
+        <div className='container'>
+          <div className='uppercase text-gray-500'>Có thể bạn cũng thích</div>
+          <div className='mt-6 grid gris-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3'>
+            {productsData?.data?.data?.products?.map((product) => (
+              <div key={product._id} className='col-span-1'>
+                <Product product={product} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
