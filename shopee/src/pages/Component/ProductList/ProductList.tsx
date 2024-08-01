@@ -29,6 +29,7 @@ export default function ProductList() {
     },
     staleTime: 3 * 60 * 1000
   })
+
   return (
     <div className='bg-gray-200 py-6'>
       <div className='container'>

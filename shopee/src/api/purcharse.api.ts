@@ -8,9 +8,20 @@ const purchaseApi = {
   addToCart(body: { product_id: string; buy_count: number }) {
     return http.post<SuccessRespone<Purchase>>(`${URL}/add-to-cart`, body)
   },
-  getPurchaseList(params: { status: PurchaseListStatus }) {
-    return http.get<SuccessRespone<Purchase>>(`${URL}`, {
+  getPurchases(params: { status: PurchaseListStatus }) {
+    return http.get<SuccessRespone<Purchase[]>>(`${URL}`, {
       params
+    })
+  },
+  buyProducts(body: { product_id: string; buy_count: number }[]) {
+    return http.post<SuccessRespone<Purchase[]>>(`${URL}/buy-products`, body)
+  },
+  updatePurchase(body: { product_id: string; buy_count: number }) {
+    return http.put<SuccessRespone<Purchase>>(`${URL}/update-purchase`, body)
+  },
+  deletePurchase(purchaseIds: string[]) {
+    return http.delete<SuccessRespone<{ deleted_count: number }>>(`${URL}`, {
+      data: purchaseIds
     })
   }
 }
