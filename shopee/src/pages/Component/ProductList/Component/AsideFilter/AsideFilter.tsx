@@ -125,7 +125,7 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       </Link>
       <div className='bg-gray-300 h-[1px] my-4' />
       <div className='my-5 '>
-        <div>Khoản giá</div>
+        <div>Khoảng giá</div>
         <form className='mt-2' onSubmit={onSubmit}>
           <div className='flex items-start'>
             <Controller
