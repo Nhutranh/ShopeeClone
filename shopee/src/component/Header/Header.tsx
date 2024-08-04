@@ -14,6 +14,7 @@ import { omit } from 'lodash'
 import { purchaseStatus } from 'src/constants/purchase'
 import purchaseApi from 'src/api/purcharse.api'
 import { fomatCurrency } from 'src/untils/untils'
+import { queryClient } from 'src/main'
 
 type FormData = Pick<Schema, 'name'>
 const nameSchema = schema.pick(['name'])
@@ -35,12 +36,14 @@ export default function Header() {
     onSuccess: () => {
       setIsAuthenticated(false)
       setProfile(null)
+      queryClient.removeQueries({ queryKey: ['purchases', { status: purchaseStatus.inCart }] })
     }
   })
 
   const { data: purchaseInCartData } = useQuery({
     queryKey: ['purchases', { status: purchaseStatus.inCart }],
-    queryFn: () => purchaseApi.getPurchases({ status: purchaseStatus.inCart })
+    queryFn: () => purchaseApi.getPurchases({ status: purchaseStatus.inCart }),
+    enabled: isAuthenticated
   })
 
   const purchasesInCart = purchaseInCartData?.data.data
@@ -215,9 +218,12 @@ export default function Header() {
                             ? purchasesInCart.length - maxPurchase
                             : 'Thêm hàng vào giỏ'}
                         </div>
-                        <button className='ml-10 capitalize bg-orange-500 hover:bg-opacity-80 px-4 py-2 rounded-sm text-white'>
+                        <Link
+                          to={path.cart}
+                          className='ml-10 capitalize bg-orange-500 hover:bg-opacity-80 px-4 py-2 rounded-sm text-white'
+                        >
                           Xem giỏ hàng
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   ) : (
@@ -241,9 +247,11 @@ export default function Header() {
                     d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
                   />
                 </svg>
-                <div className='absolute top-[-14px] right-[-8px] rounded-full bg-white/80 px-3 py-1 text-black'>
-                  {purchasesInCart?.length}
-                </div>
+                {purchasesInCart && (
+                  <div className='absolute top-[-14px] right-[-8px] rounded-full bg-white/80 px-3 py-1 text-black'>
+                    {purchasesInCart?.length}
+                  </div>
+                )}
               </Link>
             </Popover>
           </div>
