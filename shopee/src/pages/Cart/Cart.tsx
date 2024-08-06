@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import purchaseApi from 'src/api/purcharse.api'
+import Button from 'src/component/Button'
 import Quanlity from 'src/component/Quanlity'
 import path from 'src/constants/path'
 import { purchaseStatus } from 'src/constants/purchase'
@@ -42,7 +43,7 @@ export default function Cart() {
               {purchasesInCart?.map((purchase, index) => (
                 <div
                   key={purchase._id}
-                  className='py-5 px-4 text-gray-500 grid grid-cols-12 text-center rounded-sm border border-gray-200 bg-white'
+                  className='py-5 px-4 m-3 text-gray-500 grid grid-cols-12 text-center rounded-sm border border-gray-200 bg-white'
                 >
                   <div className='col-span-6'>
                     <div className='flex'>
@@ -95,6 +96,28 @@ export default function Cart() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+        <div className='sticky bottom-0 z-10 flex items-center rounded-sm bg-white p-5 shadow-sm border border-gray-200'>
+          <div className='flex flex-shrink-0 items-center justify-center pr-3'>
+            <input type='checkbox' className='h-5 w-5 accent-orange-500' />
+          </div>
+          <button className='mx-3 border-none bg-none'>Chọn tất cả</button>
+          <button className='mx-3 border-none bg-none'>Xóa</button>
+          <div className='ml-auto flex items-center '>
+            <div>
+              <div className='flex items-center justify-end'>
+                <div>Tổng thanh toán(0 sản phẩm): </div>
+                <div className='ml-2 text-2xl text-orange-400'>đ138000</div>
+              </div>
+              <div className='flex items-center justify-end text-sm'>
+                <div className='text-gray-500'>Tiết kiệm</div>
+                <div className='ml-6 text-orange-500'>đ138000</div>
+              </div>
+            </div>
+            <Button className=' flex rounded-sm ml-6 justify-center items-center h-10 w-52 uppercase bg-red-500 text-white text-sm hover:bg-red-600'>
+              Mua hàng
+            </Button>
           </div>
         </div>
       </div>
