@@ -1,18 +1,55 @@
 import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import purchaseApi from 'src/api/purcharse.api'
 import Button from 'src/component/Button'
 import Quanlity from 'src/component/Quanlity'
 import path from 'src/constants/path'
 import { purchaseStatus } from 'src/constants/purchase'
+import { Purchase } from 'src/types/purchase.type'
 import { fomatCurrency, generateNameID } from 'src/untils/untils'
+import { produce } from 'immer'
+
+interface ExtendedPurchase extends Purchase {
+  disabled: boolean
+  checked: boolean
+}
 
 export default function Cart() {
+  const [extendedPurrchase, setExtendedPurrchase] = useState<ExtendedPurchase[]>([])
   const { data: purchaseInCartData } = useQuery({
     queryKey: ['purchases', { status: purchaseStatus.inCart }],
     queryFn: () => purchaseApi.getPurchases({ status: purchaseStatus.inCart })
   })
   const purchasesInCart = purchaseInCartData?.data.data
+  const isAllChecked = extendedPurrchase.every((purchase) => purchase.checked)
+  useEffect(() => {
+    setExtendedPurrchase(
+      purchasesInCart?.map((purchase) => ({
+        ...purchase,
+        disabled: false,
+        checked: false
+      })) || []
+    )
+  }, [purchasesInCart])
+
+  const handleCheck = (productIndex: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setExtendedPurrchase(
+      produce((draft) => {
+        draft[productIndex].checked = event.target.checked
+      })
+    )
+  }
+
+  const handleCheckAll = () => {
+    setExtendedPurrchase((prev) =>
+      prev.map((purchase) => ({
+        ...purchase,
+        checked: !isAllChecked
+      }))
+    )
+  }
+  console.log(extendedPurrchase)
 
   return (
     <div className='bg-neutral-100 py-16'>
@@ -23,7 +60,12 @@ export default function Cart() {
               <div className='col-span-6 bg-white'>
                 <div className='flex items-center'>
                   <div className='flex flex-shrink-0 items-center justify-center pr-3'>
-                    <input type='checkbox' className='h-5 w-5 accent-orange-500' />
+                    <input
+                      type='checkbox'
+                      className='h-5 w-5 accent-orange-500'
+                      checked={isAllChecked}
+                      onClick={handleCheckAll}
+                    />
                   </div>
                   <div>
                     <div className='flex-grow text-black ml-3'> Sản phẩm</div>
@@ -40,7 +82,7 @@ export default function Cart() {
               </div>
             </div>
             <div className='my-3 rounded-sm bg-white p-5 shadow-sm'>
-              {purchasesInCart?.map((purchase, index) => (
+              {extendedPurrchase?.map((purchase, index) => (
                 <div
                   key={purchase._id}
                   className='py-5 px-4 m-3 text-gray-500 grid grid-cols-12 text-center rounded-sm border border-gray-200 bg-white'
@@ -48,7 +90,12 @@ export default function Cart() {
                   <div className='col-span-6'>
                     <div className='flex'>
                       <div className='flex flex-shrink-0 items-center justify-center pr-3'>
-                        <input type='checkbox' className='h-5 w-5 accent-orange-500' />
+                        <input
+                          type='checkbox'
+                          className='h-5 w-5 accent-orange-500'
+                          checked={purchase.checked}
+                          onChange={handleCheck(index)}
+                        />
                       </div>
                       <div className='flex-grow'>
                         <div className='flex'>
@@ -100,9 +147,14 @@ export default function Cart() {
         </div>
         <div className='sticky bottom-0 z-10 flex items-center rounded-sm bg-white p-5 shadow-sm border border-gray-200'>
           <div className='flex flex-shrink-0 items-center justify-center pr-3'>
-            <input type='checkbox' className='h-5 w-5 accent-orange-500' />
+            <input
+              type='checkbox'
+              className='h-5 w-5 accent-orange-500'
+              checked={isAllChecked}
+              onClick={handleCheckAll}
+            />
           </div>
-          <button className='mx-3 border-none bg-none'>Chọn tất cả</button>
+          <button className='mx-3 border-none bg-none'>Chọn tất cả ({extendedPurrchase.length})</button>
           <button className='mx-3 border-none bg-none'>Xóa</button>
           <div className='ml-auto flex items-center '>
             <div>
