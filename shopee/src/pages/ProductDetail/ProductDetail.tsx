@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import DOMPurify from 'dompurify'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ProductApi from 'src/api/Product.api'
 import ProductRating from 'src/component/ProductRating'
 import { Product as ProductType, ProductListConfig } from 'src/types/product.type'
@@ -9,13 +9,14 @@ import { fomatCurrency, fomatNumberToSocialStyle, getIDFromNameID, rateSale } fr
 import Product from '../Component/ProductList/Component/Product'
 import Quanlity from 'src/component/Quanlity'
 import purchaseApi from 'src/api/purcharse.api'
-import { queryClient } from 'src/main'
 import { purchaseStatus } from 'src/constants/purchase'
 import { toast } from 'react-toastify'
+import path from 'src/constants/path'
 
 export default function ProductDetail() {
   const [buyCount, setBuyCount] = useState(1)
   const { nameId } = useParams()
+  const queryClient = useQueryClient()
   const id = getIDFromNameID(nameId as string)
   const { data: productDetailData } = useQuery({
     queryKey: ['product', id],
@@ -34,6 +35,7 @@ export default function ProductDetail() {
   const addTocartMutation = useMutation({
     mutationFn: (body: { product_id: string; buy_count: number }) => purchaseApi.addToCart(body)
   })
+  const navigate = useNavigate()
 
   const queryConfig = { limit: '20', page: '1', category: product?.category._id }
   const { data: productsData } = useQuery({
@@ -107,6 +109,16 @@ export default function ProductDetail() {
         }
       }
     )
+  }
+
+  const buyNow = async () => {
+    const res = await addTocartMutation.mutateAsync({ buy_count: buyCount, product_id: product?._id as string })
+    const purchase = res.data.data
+    navigate(path.cart, {
+      state: {
+        purchaseId: purchase._id
+      }
+    })
   }
 
   if (!product) return null
@@ -231,7 +243,10 @@ export default function ProductDetail() {
                   </svg>
                   <span className='ml-3'>Thêm vào giỏ hàng</span>
                 </button>
-                <button className='flex ml-4 h-12 items-center justify-center rounded-sm border border-orange-500 bg-orange-500 px-5 capitalize text-white shadow-sm hover:bg-orange-400'>
+                <button
+                  onClick={buyNow}
+                  className='flex ml-4 h-12 items-center justify-center rounded-sm border border-orange-500 bg-orange-500 px-5 capitalize text-white shadow-sm hover:bg-orange-400'
+                >
                   Mua ngay
                 </button>
               </div>

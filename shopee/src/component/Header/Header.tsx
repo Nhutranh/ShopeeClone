@@ -64,7 +64,7 @@ export default function Header() {
             <Popover
               renderPopover={
                 <div className='bg-white max-w-[400px] text-sm shadow-md rounded-sm relative border-gray-200'>
-                  {purchasesInCart ? (
+                  {purchasesInCart && purchasesInCart.length > 0 ? (
                     <div className='p-2'>
                       <div className='text-gray-400 capitalize'>Sản phẩm mới thêm</div>
                       <div className='mt-5'>
@@ -101,7 +101,7 @@ export default function Header() {
                       </div>
                     </div>
                   ) : (
-                    <div className='text-orange-500 text-lg p-5'>Không có sản phẩm nào!</div>
+                    <div className='text-orange-500 text-lg px-4 py-3'>Không có sản phẩm nào!</div>
                   )}
                 </div>
               }

@@ -4,14 +4,14 @@ import { useContext } from 'react'
 import { AppContext } from 'src/contenxts/app.context'
 import path from 'src/constants/path'
 import images from 'src/assets/images'
-import { queryClient } from 'src/main'
 import { purchaseStatus } from 'src/constants/purchase'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import authApi from 'src/api/Auth.api'
 
 export default function NavHeader() {
   const { isAuthenticated, setIsAuthenticated, setProfile, profile } = useContext(AppContext)
 
+  const queryClient = useQueryClient()
   const logoutMatation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
