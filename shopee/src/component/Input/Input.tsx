@@ -3,7 +3,7 @@ import type { RegisterOptions, UseFormRegister } from 'react-hook-form'
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string
-  placehoder?: string
+  placeholder?: string
   classNameInput?: string
   classNameError?: string
 
