@@ -1,16 +1,23 @@
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import images from 'src/assets/images'
 import path from 'src/constants/path'
+import { AppContext } from 'src/contenxts/app.context'
 
 export default function UserSidenav() {
+  const { profile } = useContext(AppContext)
   return (
     <>
       <div className='flex items-center border-b border-b-gray-200 py-4'>
         <Link to={path.profile}>
-          <img src={images.logo} alt='avt' className='w-[64px] h-[64px] object-cover rounded-full' />
+          <img
+            src={profile?.avatar ? profile.avatar : images.logo}
+            alt='avt'
+            className='w-[64px] h-[64px] object-cover rounded-full'
+          />
         </Link>
         <div className='flex-grow pl-4'>
-          <div className='mb-1 truncate font-semibold text-gray-600'>Phan Như Tranh</div>
+          <div className='mb-1 truncate font-semibold text-gray-600'>{profile?.email}</div>
           <Link to={path.profile} className='text-gray-400 flex'>
             <svg
               xmlns='http://www.w3.org/2000/svg'

@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import userApi from 'src/api/User.api'
 import images from 'src/assets/images'
@@ -9,17 +9,22 @@ import Input from 'src/component/Input'
 import InputNumber from 'src/component/InputNumber'
 import { userSchema } from 'src/untils/rules'
 import DateSelect from '../../Component/DateSelect'
+import { toast } from 'react-toastify'
+import { AppContext } from 'src/contenxts/app.context'
+import { setProfileToLS } from 'src/untils/auth'
 
 type FormData = Pick<userSchema, 'name' | 'address' | 'phone' | 'date_of_birth' | 'avatar'>
 
 const profileSchema = userSchema.pick(['name', 'address', 'avatar', 'phone', 'date_of_birth'])
 
 export default function Profile() {
+  const { setProfile } = useContext(AppContext)
   const {
     register,
     control,
     formState: { errors },
     handleSubmit,
+
     setValue
   } = useForm<FormData>({
     defaultValues: {
@@ -31,8 +36,10 @@ export default function Profile() {
     },
     resolver: yupResolver(profileSchema)
   })
-  const updateProfileMutation = useMutation(userApi.updateProfile)
-  const { data: profileData } = useQuery({
+  const updateProfileMutation = useMutation({
+    mutationFn: userApi.updateProfile
+  })
+  const { data: profileData, refetch } = useQuery({
     queryKey: ['profile'],
     queryFn: userApi.getProfile
   })
@@ -47,9 +54,14 @@ export default function Profile() {
       setValue('date_of_birth', profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(1990, 0, 1))
     }
   }, [profile, setValue])
+
   const onSubmit = handleSubmit(async (data) => {
     console.log(data)
-    //updateProfileMutation.mutateAsync({})
+    const res = await updateProfileMutation.mutateAsync({ ...data, date_of_birth: data.date_of_birth?.toISOString() })
+    refetch()
+    toast.success(res.data.message)
+    setProfile(res.data.data)
+    setProfileToLS(res.data.data)
   })
 
   return (

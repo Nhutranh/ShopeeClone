@@ -88,7 +88,11 @@ export default function NavHeader() {
           }
         >
           <div className='w-6 h-6 mr-2 flex-shrink-0'>
-            <img src={images.logo} alt='avt' className='w-full h-full object-cover rounded-full' />
+            <img
+              src={profile?.avatar ? profile?.avatar : images.logo}
+              alt='avt'
+              className='w-full h-full object-cover rounded-full'
+            />
           </div>
           <div>{profile?.email}</div>
         </Popover>

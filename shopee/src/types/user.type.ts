@@ -1,7 +1,7 @@
 type Role = 'User' | 'Admin'
 export interface User {
   roles: Role[]
-  address: string
+  address?: string
   name?: string
   date_of_birth?: string
   avatar?: string
