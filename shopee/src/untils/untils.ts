@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios'
+import images from 'src/assets/images'
 import HttpStatusCode from 'src/constants/httpStatusCode.enum'
 
 export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
@@ -38,3 +39,6 @@ export const getIDFromNameID = (nameId: string) => {
   const arr = nameId.split('-i.')
   return arr[arr.length - 1]
 }
+
+export const getAvtURL = (avatarName?: string) =>
+  avatarName ? `https://api-ecom.duthanhduoc.com/images/${avatarName}` : images.logo

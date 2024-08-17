@@ -70,7 +70,7 @@ export default function Register() {
                 name='email'
                 register={register}
                 type='email'
-                placehoder='email'
+                placeholder='email'
                 errorMessage={errors.email?.message}
                 className='mt-8'
               />
@@ -79,7 +79,7 @@ export default function Register() {
                 name='password'
                 register={register}
                 type='password'
-                placehoder='password'
+                placeholder='password'
                 errorMessage={errors.password?.message}
                 className='mt-8'
               />
@@ -87,7 +87,7 @@ export default function Register() {
                 name='confirm_pasword'
                 register={register}
                 type='confirm_pasword'
-                placehoder='confirm_pasword'
+                placeholder='confirm_pasword'
                 errorMessage={errors.confirm_pasword?.message}
                 className='mt-8'
                 autoComplete='on'

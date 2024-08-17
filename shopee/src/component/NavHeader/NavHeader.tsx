@@ -3,10 +3,10 @@ import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from 'src/contenxts/app.context'
 import path from 'src/constants/path'
-import images from 'src/assets/images'
 import { purchaseStatus } from 'src/constants/purchase'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import authApi from 'src/api/Auth.api'
+import { getAvtURL } from 'src/untils/untils'
 
 export default function NavHeader() {
   const { isAuthenticated, setIsAuthenticated, setProfile, profile } = useContext(AppContext)
@@ -88,11 +88,7 @@ export default function NavHeader() {
           }
         >
           <div className='w-6 h-6 mr-2 flex-shrink-0'>
-            <img
-              src={profile?.avatar ? profile?.avatar : images.logo}
-              alt='avt'
-              className='w-full h-full object-cover rounded-full'
-            />
+            <img src={getAvtURL(profile?.avatar)} alt='avt' className='w-full h-full object-cover rounded-full' />
           </div>
           <div>{profile?.email}</div>
         </Popover>
