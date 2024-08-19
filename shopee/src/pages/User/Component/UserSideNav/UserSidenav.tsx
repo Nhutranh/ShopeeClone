@@ -1,5 +1,6 @@
+import classNames from 'classnames'
 import { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import path from 'src/constants/path'
 import { AppContext } from 'src/contenxts/app.context'
 import { getAvtURL } from 'src/untils/untils'
@@ -9,12 +10,12 @@ export default function UserSidenav() {
   return (
     <>
       <div className='flex items-center border-b border-b-gray-200 py-4'>
-        <Link to={path.profile}>
+        <NavLink to={path.profile}>
           <img src={getAvtURL(profile?.avatar)} alt='avt' className='w-[64px] h-[64px] object-cover rounded-full' />
-        </Link>
+        </NavLink>
         <div className='flex-grow pl-4'>
           <div className='mb-1 truncate font-semibold text-gray-600'>{profile?.email}</div>
-          <Link to={path.profile} className='text-gray-400 flex'>
+          <NavLink to={path.profile} className='text-gray-400 flex'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               fill='none'
@@ -30,11 +31,19 @@ export default function UserSidenav() {
               />
             </svg>
             Sửa Hồ Sơ
-          </Link>
+          </NavLink>
         </div>
       </div>
       <div className='mt-7'>
-        <Link to={path.profile} className='flex items-center capitalize text-orange-500 transition-colors'>
+        <NavLink
+          to={path.profile}
+          className={({ isActive }) =>
+            classNames('flex items-center capitalize  transition-colors', {
+              'text-orange-500': isActive,
+              'text-gray-500': !isActive
+            })
+          }
+        >
           <div className='mr-3 '>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -52,8 +61,16 @@ export default function UserSidenav() {
             </svg>
           </div>
           Tài khoản của tôi
-        </Link>
-        <Link to={path.changepassword} className='flex items-center capitalize text-gray-500 transition-colors mt-3'>
+        </NavLink>
+        <NavLink
+          to={path.changepassword}
+          className={({ isActive }) =>
+            classNames('mt-3 flex items-center capitalize  transition-colors', {
+              'text-orange-500': isActive,
+              'text-gray-500': !isActive
+            })
+          }
+        >
           <div className='mr-3 '>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -71,8 +88,16 @@ export default function UserSidenav() {
             </svg>
           </div>
           Đổi mật khẩu
-        </Link>
-        <Link to={path.historyPurchase} className='flex items-center capitalize text-gray-500 transition-colors mt-3'>
+        </NavLink>
+        <NavLink
+          to={path.historyPurchase}
+          className={({ isActive }) =>
+            classNames('mt-3 flex items-center capitalize  transition-colors', {
+              'text-orange-500': isActive,
+              'text-gray-500': !isActive
+            })
+          }
+        >
           <div className='mr-3 '>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -90,7 +115,7 @@ export default function UserSidenav() {
             </svg>
           </div>
           Lịch sử mua hàng
-        </Link>
+        </NavLink>
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import userApi from 'src/api/User.api'
 import Button from 'src/component/Button'
@@ -14,6 +14,7 @@ import { setProfileToLS } from 'src/untils/auth'
 import { getAvtURL, isAxiosUnprocessableEntityError } from 'src/untils/untils'
 import { ErrorRespone } from 'src/types/until.type'
 import { Omit } from 'lodash'
+import InputFile from 'src/component/InputFile'
 
 type FormData = Pick<userSchema, 'name' | 'address' | 'phone' | 'date_of_birth' | 'avatar'>
 type FormDataError = Omit<FormData, 'date_of_birth'> & {
@@ -23,20 +24,14 @@ type FormDataError = Omit<FormData, 'date_of_birth'> & {
 const profileSchema = userSchema.pick(['name', 'address', 'avatar', 'phone', 'date_of_birth'])
 
 export default function Profile() {
-  const maxSizeUpLoadAvt = 1048576 //bytes
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { setProfile } = useContext(AppContext)
   const [file, setFile] = useState<File>()
-
-  const previewImage = useMemo(() => {
-    return file ? URL.createObjectURL(file) : ''
-  }, [file])
 
   const {
     register,
     control,
-    watch,
     setError,
+    watch,
     formState: { errors },
     handleSubmit,
     setValue
@@ -50,6 +45,13 @@ export default function Profile() {
     },
     resolver: yupResolver(profileSchema)
   })
+
+  const avatar = watch('avatar')
+
+  const previewImage = useMemo(() => {
+    return file ? URL.createObjectURL(file) : ''
+  }, [file])
+
   const updateProfileMutation = useMutation({
     mutationFn: userApi.updateProfile
   })
@@ -61,8 +63,6 @@ export default function Profile() {
     queryFn: userApi.getProfile
   })
   const profile = profileData?.data.data
-
-  const avatar = watch('avatar')
 
   useEffect(() => {
     if (profile) {
@@ -108,19 +108,8 @@ export default function Profile() {
     }
   })
 
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileFromLocal = event.target.files?.[0]
-    if (fileFromLocal && (fileFromLocal?.size >= maxSizeUpLoadAvt || fileFromLocal?.type.includes('image'))) {
-      toast.error('Dung lượng tối đa 1MB, định dạng JEPG, PNG', {
-        position: 'top-center'
-      })
-    } else {
-      setFile(fileFromLocal)
-    }
-  }
-
-  const handleUpLoad = () => {
-    fileInputRef.current?.click()
+  const handleChangeFile = (file?: File) => {
+    setFile(file)
   }
 
   return (
@@ -207,21 +196,8 @@ export default function Profile() {
                 alt='avtUsser'
                 className='h-full rounded-full object-cover w-full'
               />
-              <input
-                className='hidden'
-                type='file'
-                accept='.jpg,.jpeg,.png'
-                ref={fileInputRef}
-                onChange={onFileChange}
-              />
             </div>
-            <button
-              type='button'
-              onClick={handleUpLoad}
-              className='flex h-10 items-center border border-gray-100 justify-end bg-white px-6 text-sm text-gray-600 shadow-sm'
-            >
-              Chọn ảnh
-            </button>
+            <InputFile onChange={handleChangeFile} />
             <div className='mt-3 text-gray-400'>
               <div>Dung lượng tối đa 1MB</div>
               <div>Định dạng JEPG, PNG</div>
