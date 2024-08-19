@@ -23,6 +23,7 @@ type FormDataError = Omit<FormData, 'date_of_birth'> & {
 const profileSchema = userSchema.pick(['name', 'address', 'avatar', 'phone', 'date_of_birth'])
 
 export default function Profile() {
+  const maxSizeUpLoadAvt = 1048576 //bytes
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { setProfile } = useContext(AppContext)
   const [file, setFile] = useState<File>()
@@ -38,7 +39,6 @@ export default function Profile() {
     setError,
     formState: { errors },
     handleSubmit,
-
     setValue
   } = useForm<FormData>({
     defaultValues: {
@@ -110,7 +110,13 @@ export default function Profile() {
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileFromLocal = event.target.files?.[0]
-    setFile(fileFromLocal)
+    if (fileFromLocal && (fileFromLocal?.size >= maxSizeUpLoadAvt || fileFromLocal?.type.includes('image'))) {
+      toast.error('Dung lượng tối đa 1MB, định dạng JEPG, PNG', {
+        position: 'top-center'
+      })
+    } else {
+      setFile(fileFromLocal)
+    }
   }
 
   const handleUpLoad = () => {
